@@ -62,6 +62,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 JSZIP
 (c) 2009-2012 Stuart Knightley <stuart [at] stuartk.com>
+
 http://stuk.github.io/jszip/
 
 The MIT License
@@ -446,6 +447,7 @@ bin/node_modules/shelljs
 ================================================================================
 
 Copyright (c) 2012, Artur Adib <aadib@mozilla.com>
+
 All rights reserved.
 
 You may use this project under the terms of the New BSD license as follows:
@@ -522,6 +524,7 @@ Release under The MIT License
 * @description. jQuery ajax transport for making binary data type requests.
 * @version 1.0 
 * @author Henry Algus <henryalgus@gmail.com>
+
 *
 */
 

@@ -2,18 +2,13 @@
 --Start of Global Scope---------------------------------------------------------
 
 local DOT_DECO = View.ShapeDecoration.create()
-DOT_DECO:setLineColor(255, 255, 255) -- white
-DOT_DECO:setPointSize(0.5)
+DOT_DECO:setPointSize(0.5):setLineColor(255, 255, 255) -- white
 
-local EDGE_DECO = View.ShapeDecoration.create()
-EDGE_DECO:setLineColor(59, 156, 208) -- blue
-EDGE_DECO:setLineWidth(0.1)
-EDGE_DECO:setPointSize(0.5)
+local EDGE_DECO = View.ShapeDecoration.create():setLineWidth(0.1)
+EDGE_DECO:setPointSize(0.5):setLineColor(59, 156, 208) -- blue
 
-local LINE_DECO = View.ShapeDecoration.create()
-LINE_DECO:setLineColor(242, 148, 0) -- orange
-LINE_DECO:setLineWidth(0.1)
-LINE_DECO:setPointSize(0.1)
+local LINE_DECO = View.ShapeDecoration.create():setLineWidth(0.1)
+LINE_DECO:setPointSize(0.1):setLineColor(242, 148, 0) -- orange
 
 local ANGLE_TO_AGGREGATE = 5 * math.pi / 180 -- 5 degree
 local MIN_LENGTH = 0.75 -- min length between to edge points in mm
@@ -22,24 +17,6 @@ local MIN_LENGTH = 0.75 -- min length between to edge points in mm
 local DELAY = 50
 
 --End of Global Scope-----------------------------------------------------------
-
-local function profileToPolyline(profile, spaceBetweenPoints)
-  if not profile then return {} end
-  spaceBetweenPoints = spaceBetweenPoints or 1
-  local polyline
-
-  local pointBuff = {}
-  for i = 0, profile:getSize() - 1 do
-    local x = i * spaceBetweenPoints
-    local y = Profile.getValue(profile, i)
-    pointBuff[#pointBuff + 1] = Point.create(x, y)
-  end
-
-  if #pointBuff > 0 then
-    polyline = Shape.createPolyline(pointBuff, false)
-  end
-  return polyline
-end
 
 local function main()
   local heightMap = Object.load('resources/tabAerator.json')
@@ -110,7 +87,9 @@ local function main()
       edgePoints[#edgePoints + 1] = Point.create(index * pxSizeX, scannedProfile:getValue(index))
     end
 
-    local profileLine = profileToPolyline(scannedProfile, pxSizeX)
+    scannedProfile = Profile.convertCoordinateType(scannedProfile, 'EXPLICIT_1D')
+    local pts = Profile.toPoints(scannedProfile)
+    local profileLine = Shape.createPolyline(pts, false)
 
     local centerProfile = Point.create(scannedProfile:getSize() * pxSizeX / 2, 0)
     local profileTransformation = Transform.createRigid2D(curAngle, center:getX() - centerProfile:getX(),
@@ -121,12 +100,10 @@ local function main()
     local v = View.create()
 
     v:clear()
-    local imageID = v:addImage(heightMap)
-    v:addShape(center, DOT_DECO, nil, imageID)
-    v:addShape(profileLine, LINE_DECO, nil, imageID)
-    for _, point in ipairs(edgePoints) do
-      v:addShape(point, EDGE_DECO, nil, imageID)
-    end
+    v:addImage(heightMap)
+    v:addShape(center, DOT_DECO)
+    v:addShape(profileLine, LINE_DECO)
+    v:addShape(edgePoints, EDGE_DECO)
     v:present()
 
     curAngle = (curAngle + ANGLE_TO_AGGREGATE) % (2 * math.pi)
